@@ -5,12 +5,12 @@
 #define TAMANHO_TABULEIRO 8
 
 
-int inicializaTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
+/*int inicializaTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
     int i,j;
     for(i=0;i<TAMANHO_TABULEIRO;i++)
         for(j=0;j<TAMANHO_TABULEIRO;j++)
             tabuleiro[i][j] = 0;
-}
+}*/
 
 char alimentatabuleiro(int posicao){
 
@@ -51,10 +51,10 @@ int printaTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
     }
 }
 
-void inicializaJogo(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
+/*void inicializaJogo(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
     //inicializaTabuleiro(tabuleiro);
     // @TODO: Inicializar variáveis de jogo
-}
+}*/
 
 
 int mostraMenu(){
@@ -71,6 +71,25 @@ int mostraMenu(){
 
 }
 
+void mudaposicao(int tabuleiro[][TAMANHO_TABULEIRO], int linha1, int coluna1, int linha2, int coluna2){
+    int aux;
+
+    aux = tabuleiro[linha1][coluna1];
+
+    tabuleiro[linha1][coluna1] = tabuleiro[linha2][coluna2];
+
+    tabuleiro[linha2][coluna2] = aux;
+
+}
+
+int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int coluna1,int linha2,int coluna2){
+
+    mudaposicao(tabuleiro,linha1,coluna1,linha2,coluna2);
+
+    return 1;
+}
+
+
 int main(){
     int jogar = 1;
     int menu = 0;
@@ -86,19 +105,35 @@ int main(){
 
 
     jogar = mostraMenu();
-    if(jogar){
-        inicializaJogo(tabuleiro);
+    int linha1, linha2;
+    char coluna1, coluna2;
 
-    }
     while(jogar){
 
         printaTabuleiro(tabuleiro);
-        if(menu){
-            jogar = mostraMenu();
-            if(jogar){
-                inicializaJogo(tabuleiro);
-            }
+        while(1){
+            printf("Jogador 1 eh a sua vez: ");
+            scanf("%d%c",&linha1,&coluna1);
+            printf("para: ");
+            scanf("%d%c",&linha2,&coluna2);
+            //faz -1 e -a para diminuir, pois a matriz inicia em zero mas para o usuario inicia em 1
+            if(validacoes(tabuleiro, 1, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a'))
+                break;
+            printf("Movimento invalido, tente novamente!\n");
         }
-        break;
+
+        printaTabuleiro(tabuleiro);
+
+        while(1){ //Turno do Jogador 2
+            printf("Jogador 2 eh a sua vez: ");
+            scanf("%d%c",&linha1,&coluna1);
+    	    printf("para: ");
+        	scanf("%d%c",&linha2,&coluna2);
+        	if(validacoes(tabuleiro, 2, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a'))
+        	    break;
+        	printf("Movimento invalido, tente novamente\n"); //Caso o movimento esteja incorreto, volta para o laco de repeticao
+
+
+        }
     }
 }
