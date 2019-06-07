@@ -71,7 +71,7 @@ int mostraMenu(){
 
 }
 
-void mudaposicao(int tabuleiro[][TAMANHO_TABULEIRO], int linha1, int coluna1, int linha2, int coluna2){
+void mudaposicao(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int linha1, int coluna1, int linha2, int coluna2){
     int aux;
 
     aux = tabuleiro[linha1][coluna1];
@@ -83,15 +83,31 @@ void mudaposicao(int tabuleiro[][TAMANHO_TABULEIRO], int linha1, int coluna1, in
 }
 
 // @TODO: Aqui colocar a validação se comeu uma peça inimiga
-int validaMovimento(int linhaInicial, int colunaInicial, int linhaFinal, int colunaFinal){
+int movimentoValido(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int jogador, int linhaInicial, int colunaInicial, int linhaDestino, int colunaDestino, int quemJoga){
+        
+    // É quem joga, aí avalia os arredores se pode
+    if(tabuleiro[linhaInicial][colunaInicial]==quemJoga || tabuleiro[linhaInicial][colunaInicial]==quemJoga+2){
+        if(tabuleiro[linhaDestino][colunaDestino] == 0 && 
+        (tabuleiro[linhaDestino][colunaDestino+1] ||
+        tabuleiro[linhaDestino-1][colunaDestino-1] ||
+        tabuleiro[linhaDestino][colunaDestino+1] ||)
+        tabuleiro[linhaDestino+1][colunaDestino] ||){
+
+        }
+        if(tabuleiro[i+1][j+1]==1 || tabuleiro[i-1][j-1]==1 || tabuleiro[i+1][j-1]==1 || tabuleiro[i-1][j+1]==1){
+
+        }
+    }
 
 }
 
 int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int coluna1,int linha2,int coluna2){
 
-    if(validaMovimento(linha1,coluna1,linha2,coluna2)){
+    // if(validaMovimento(linha1,coluna1,linha2,coluna2)){
+        movimentoValido(tabuleiro, jogador, linha1,coluna1,linha2,coluna2);
         mudaposicao(tabuleiro,linha1,coluna1,linha2,coluna2);
-    }
+        
+    // }
 
     return 1;
 }
@@ -127,7 +143,7 @@ int main(){
             printf("para: ");
             scanf("%d%c",&linha2,&coluna2);
             //faz -1 e -a para diminuir, pois a matriz inicia em zero mas para o usuario inicia em 1
-            if(validacoes(tabuleiro, quemJoga, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a'))
+            if(validacoes(tabuleiro, quemJoga, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a',jogadasPossiveis))
                 break;
             printf("Movimento invalido, tente novamente!\n");
         }
