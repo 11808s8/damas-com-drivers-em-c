@@ -82,12 +82,21 @@ void mudaposicao(int tabuleiro[][TAMANHO_TABULEIRO], int linha1, int coluna1, in
 
 }
 
+// @TODO: Aqui colocar a validação se comeu uma peça inimiga
+int validaMovimento(int linhaInicial, int colunaInicial, int linhaFinal, int colunaFinal){
+
+}
+
 int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int coluna1,int linha2,int coluna2){
 
-    mudaposicao(tabuleiro,linha1,coluna1,linha2,coluna2);
+    if(validaMovimento(linha1,coluna1,linha2,coluna2)){
+        mudaposicao(tabuleiro,linha1,coluna1,linha2,coluna2);
+    }
 
     return 1;
 }
+
+
 
 
 int main(){
@@ -107,33 +116,23 @@ int main(){
     jogar = mostraMenu();
     int linha1, linha2;
     char coluna1, coluna2;
+    int quemJoga = 1;
 
     while(jogar){
 
         printaTabuleiro(tabuleiro);
         while(1){
-            printf("Jogador 1 eh a sua vez: ");
+            printf("Jogador %d eh a sua vez: ", quemJoga);
             scanf("%d%c",&linha1,&coluna1);
             printf("para: ");
             scanf("%d%c",&linha2,&coluna2);
             //faz -1 e -a para diminuir, pois a matriz inicia em zero mas para o usuario inicia em 1
-            if(validacoes(tabuleiro, 1, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a'))
+            if(validacoes(tabuleiro, quemJoga, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a'))
                 break;
             printf("Movimento invalido, tente novamente!\n");
         }
-
-        printaTabuleiro(tabuleiro);
-
-        while(1){ //Turno do Jogador 2
-            printf("Jogador 2 eh a sua vez: ");
-            scanf("%d%c",&linha1,&coluna1);
-    	    printf("para: ");
-        	scanf("%d%c",&linha2,&coluna2);
-        	if(validacoes(tabuleiro, 2, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a'))
-        	    break;
-        	printf("Movimento invalido, tente novamente\n"); //Caso o movimento esteja incorreto, volta para o laco de repeticao
-
-
-        }
+        quemJoga ++;
+        if(quemJoga>2)
+            quemJoga=1;
     }
 }
