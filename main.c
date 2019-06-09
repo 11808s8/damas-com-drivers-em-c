@@ -122,11 +122,20 @@ int movimentoValido(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int jog
                 }
                 if(linhaDestino-1==linhaInicial && (colunaDestino+1==colunaInicial || colunaDestino-1 == colunaInicial)){
                     return 1; // Retorna Válido. Neste ponto não há peça impedindo, é só movimentar.
+                }else if(linhaDestino-2==linhaInicial && (colunaDestino+2==colunaInicial || colunaDestino-2 == colunaInicial)
+                && (tabuleiro[linhaDestino-1][colunaDestino+1]==3 || tabuleiro[linhaDestino-1][colunaDestino+1]==5
+                || tabuleiro[linhaDestino-1][colunaDestino-1] == 3 || tabuleiro[linhaDestino-1][colunaDestino-1]==5)){
+                    if(colunaDestino+2==colunaInicial){ // @TODO: SE FOR AUMENTAR SCORE, AUMENTA AQUI
+                        tabuleiro[linhaDestino-1][colunaDestino+1]=1;
+                    }else{
+                        tabuleiro[linhaDestino-1][colunaDestino-1]=1;
+                    }
+                        return 1;
                 }else{
                     printf("Você está tentando movimentar sua peça para muito longe! Jogada inválida. \n");
                     return 0;
                 }
-                    // @TODO: COLOCAR AQUI A VALIDAÇÃO CASO VAI MATAR UMA PEÇA INIMIGA
+                    
             }
 
             // É uma peça comum vermelha (só movimenta para cima)
@@ -137,6 +146,15 @@ int movimentoValido(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int jog
                 }
                 if(linhaDestino+1==linhaInicial && (colunaDestino+1==colunaInicial || colunaDestino-1 == colunaInicial)){
                     return 1; // Retorna Válido. Neste ponto não há peça impedindo, é só movimentar.
+                }else if(linhaDestino+2==linhaInicial && (colunaDestino+2==colunaInicial || colunaDestino-2 == colunaInicial)
+                && (tabuleiro[linhaDestino+1][colunaDestino+1]==2 || tabuleiro[linhaDestino+1][colunaDestino+1]==4
+                || tabuleiro[linhaDestino+1][colunaDestino-1] ==2 || tabuleiro[linhaDestino+1][colunaDestino-1]==4)){
+                    if(colunaDestino+2==colunaInicial){ // @TODO: SE FOR AUMENTAR SCORE, AUMENTA AQUI
+                        tabuleiro[linhaDestino+1][colunaDestino+1]=1;
+                    }else{
+                        tabuleiro[linhaDestino+1][colunaDestino-1]=1;
+                    }
+                        return 1;
                 }else{
                     printf("Você está tentando movimentar sua peça para muito longe! Jogada inválida. \n");
                     return 0;
@@ -185,7 +203,7 @@ int main(){
     {2,0,2,0,2,0,2,0},
     {0,2,0,2,0,2,0,2},
     {1,0,1,0,1,0,1,0},
-    {0,1,0,1,0,1,0,1},
+    {0,1,0,2,0,2,0,1},
     {3,0,3,0,3,0,3,0},
     {0,3,0,3,0,3,0,3},
 	{3,0,3,0,3,0,3,0}};
