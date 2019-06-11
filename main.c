@@ -31,6 +31,18 @@ char alimentatabuleiro(int posicao){
     return ('?');
 }
 
+void printCorPeca(int posicao){
+    if(posicao%2==0){ // Branco
+        printf("\x1B[1;37m");
+    }else{ // Vermelho
+        printf("\x1B[1;31m");
+    }
+}
+
+char resetaCorTabuleiro(){
+    printf("\x1B[0m");
+}
+
 int printaTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
     int linhas, colunas;
     printf("\n");
@@ -43,7 +55,10 @@ int printaTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
 
         for (colunas=0; colunas<TAMANHO_TABULEIRO; ++colunas) //Tamanho do tabuleiro
         {
-            printf(" %c |", alimentatabuleiro(tabuleiro[linhas][colunas]));
+            printCorPeca(tabuleiro[linhas][colunas]);
+            printf(" %c ", alimentatabuleiro(tabuleiro[linhas][colunas]));
+            resetaCorTabuleiro();
+            printf("|");
         }
         printf("\n");
         printf("  +---+---+---+---+---+---+---+---+\n");
