@@ -116,6 +116,94 @@ void mudaposicao(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int linha1
     tabuleiro[linha2][coluna2] = aux;
 }
 
+/**
+ * Função que valida o movimento para ambos os reis
+ * return int - Pode realizar o movimento (1) ou não (0)
+ * 
+ */
+int movimentoValidoReis(int tabuleiro[][TAMANHO_TABULEIRO], int linhaInicial, int colunaInicial, int linhaDestino, int colunaDestino){
+    
+    int incrementoI,incrementoJ,linhaAuxiliar, colunaAuxiliar;
+
+    // Variáveis de incremento dependendo de para qual posição o jogador pretende movimentar seu rei
+    if(linhaDestino>linhaInicial && colunaDestino>colunaInicial){
+        incrementoI = 1;
+        incrementoJ = 1;
+    }
+    else if(linhaDestino>linhaInicial && colunaDestino<colunaInicial){
+        incrementoI=1;
+        incrementoJ=-1;
+    }
+    else if(linhaDestino<linhaInicial && colunaDestino < colunaInicial){
+        incrementoI=-1;
+        incrementoJ=-1;
+    }
+    else if(linhaDestino<linhaInicial && colunaDestino > colunaInicial){
+        incrementoI=-1;
+        incrementoJ=1;
+    }
+
+    linhaAuxiliar = linhaInicial;
+    colunaAuxiliar = colunaInicial;
+
+    // Anda uma posição para sair da inicial
+    linhaAuxiliar+=incrementoI;
+    colunaAuxiliar+=incrementoJ;
+
+    int quantasPecasInimigasTomou=0;
+    while(linhaAuxiliar!=linhaDestino && colunaAuxiliar!=colunaDestino){
+        if(
+            (tabuleiro[linhaInicial][colunaInicial]==REIBRANCO &&
+            (tabuleiro[linhaAuxiliar][colunaAuxiliar]==BRANCO || 
+           tabuleiro[linhaAuxiliar][colunaAuxiliar]==REIBRANCO))
+           ||
+            (tabuleiro[linhaInicial][colunaInicial]==REIVERMELHO &&
+            (tabuleiro[linhaAuxiliar][colunaAuxiliar]==VERMELHO || 
+           tabuleiro[linhaAuxiliar][colunaAuxiliar]==REIVERMELHO))
+           )
+           {
+            printf("\nVocê não pode pular sobre suas peças! Tente novamente. \n"); // @TODO: Ajustar isso
+            return 0; // Não pode prosseguir, encontrou peça igual a sua
+        }
+
+        // Verificação para caso tenha tomado mais de 1 peça inimiga
+        if((tabuleiro[linhaInicial][colunaInicial]==REIBRANCO &&
+            (tabuleiro[linhaAuxiliar][colunaAuxiliar]==VERMELHO || tabuleiro[linhaAuxiliar][colunaAuxiliar]==REIVERMELHO))
+            ||
+            ((tabuleiro[linhaInicial][colunaInicial]==REIVERMELHO) &&
+            (tabuleiro[linhaAuxiliar][colunaAuxiliar]==BRANCO || tabuleiro[linhaAuxiliar][colunaAuxiliar]==REIBRANCO))
+        ){
+            quantasPecasInimigasTomou++;
+        }
+        
+        
+        linhaAuxiliar+=incrementoI;
+        colunaAuxiliar+=incrementoJ;
+    }
+    if(quantasPecasInimigasTomou>1){
+        printf("Só pode tomar uma peça inimiga na jogada. Se você pode tomar mais, após a primeira \n você poderá continuar jogando e comendo peças enquanto necessário.");
+        return 0;
+    }
+
+    linhaAuxiliar = linhaInicial;
+    colunaAuxiliar = colunaInicial;
+
+    // Anda uma posição para sair da inicial
+    linhaAuxiliar+=incrementoI;
+    colunaAuxiliar+=incrementoJ;
+
+    while(linhaAuxiliar!=linhaDestino && colunaAuxiliar!=colunaDestino){
+        tabuleiro[linhaAuxiliar][colunaAuxiliar]=1;
+
+        linhaAuxiliar+=incrementoI;
+        colunaAuxiliar+=incrementoJ;
+    }
+
+    // Se chegou aqui já mudou as peças do tabuleiro e poderá mover a peça rei
+    return 1;
+            
+}
+
 // @TODO: Aqui colocar a validação se comeu uma peça inimiga
 // Essa função poderia retornar a mensagem ou printar a mensagem na tela
 int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaInicial, int colunaInicial, int linhaDestino, int colunaDestino){
@@ -149,6 +237,12 @@ int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
 
         // É um espaço vazio para onde vai
         if(tabuleiro[linhaDestino][colunaDestino] == 1 ){
+
+            // Verificação para reis
+            if(tabuleiro[linhaInicial][colunaInicial]==REIBRANCO ||
+                tabuleiro[linhaInicial][colunaInicial]==REIVERMELHO){
+                    return movimentoValidoReis(tabuleiro,linhaInicial, colunaInicial, linhaDestino, colunaDestino);
+            }
             // É uma peça comum branca (só movimenta para baixo)
             if(tabuleiro[linhaInicial][colunaInicial] == BRANCO){
                 if(linhaDestino < linhaInicial){
@@ -174,6 +268,8 @@ int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
                     return 0;
                 }
             }
+
+            
 
             // É uma peça comum vermelha (só movimenta para cima)
             if(tabuleiro[linhaInicial][colunaInicial] == VERMELHO){
@@ -237,14 +333,35 @@ int main(){
     int jogar = 1;
     int menu = 0;
     int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {
-    {0,2,0,1,0,2,0,2},
-    {2,0,3,0,2,0,2,0},
-    {0,2,0,2,0,2,0,2},
-    {1,0,1,0,1,0,1,0},
-    {0,1,0,2,0,2,0,1},
-    {3,0,3,0,3,0,3,0},
-    {0,3,0,3,0,3,0,3},
-	{3,0,3,0,3,0,3,0}};
+    {0,1,0,1,0,1,0,1},
+    {1,0,1,0,1,0,4,0},
+    {0,3,0,1,0,1,0,2},
+    {1,0,1,0,2,0,1,0},
+    {0,1,0,5,0,2,0,1},
+    {1,0,1,0,1,0,3,0},
+    {0,1,0,1,0,2,0,3},
+	{1,0,3,0,3,0,1,0}};
+
+    // {0,2,0,1,0,2,0,2},
+    // {2,0,3,0,2,0,2,0},
+    // {0,4,0,2,0,2,0,2},
+    // {1,0,1,0,1,0,1,0},
+    // {0,1,0,2,0,2,0,1},
+    // {3,0,3,0,1,0,3,0},
+    // {0,3,0,3,0,1,0,3},
+	// {3,0,3,0,3,0,3,0}};
+
+    // Teste do rei branco
+    // {0,1,0,1,0,1,0,1},
+    // {1,0,1,0,1,0,1,0},
+    // {0,2,0,1,0,3,0,2},
+    // {1,0,1,0,3,0,1,0},
+    // {0,1,0,4,0,2,0,1},
+    // {1,0,1,0,1,0,3,0},
+    // {0,1,0,1,0,3,0,3},
+	// {1,0,3,0,3,0,1,0}};
+
+    
 
     setlocale(LC_ALL,"Portuguese"); // seta tudo em portugues, dai nao ocorre mais os erros com caracter especial
     fflush(stdin);
