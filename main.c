@@ -75,7 +75,7 @@ int mostraMenu(){
 
     int resposta;
     printf("\n Seja bem vindo ao jogo de Damas Anglo-Americanas");
-    printf("\n Deseja jogar como player 1 ou 2? (n para sair)");
+    printf("\n Deseja jogar como player 1 (BRANCO) ou 2 (VERMELHO)? (n para sair)");
     scanf("%d", &resposta);
 
     if(resposta==1) return 1;
@@ -273,7 +273,6 @@ int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
 int insereNaLista(Nodo **inicioLista, Nodo* novoValor){
     
     if((*inicioLista)==NULL){
-        printf("null");
         (*inicioLista)=novoValor;
         return 1;
     }
@@ -374,8 +373,7 @@ int validaMovimentoObrigatorio(Nodo* inicioLista, int linhaDestino,int colunaDes
     Nodo *aux = inicioLista;
     int i=0;
     while(aux!=NULL){
-        printf("\nLinha coluna: %d %d\n", aux->linha, aux->coluna);
-        printf("LinhaDest colunaDest: %d %d\n", linhaDestino, colunaDestino);
+        
         if(aux->linha==linhaDestino && aux->coluna==colunaDestino){
             return 1;
         }
@@ -407,18 +405,41 @@ int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int co
     return 1;
 }
 
+int aindaHaJogadas(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
+    int encontrouBranco=0, encontrouVermelho=0,i,j;
+    for(i=0;i<TAMANHO_TABULEIRO;i++){
+        for(j=0;j<TAMANHO_TABULEIRO;j++){
+            if(tabuleiro[i][j]==BRANCO || tabuleiro[i][j]==REIBRANCO){
+                encontrouBranco++;
+            }
+            else if(tabuleiro[i][j]==VERMELHO ||tabuleiro[i][j]==REIVERMELHO){
+                encontrouVermelho++;
+            }
+        }
+    }
+    
+    if(encontrouBranco>0 && encontrouVermelho==0){
+        return 2; // branco venceu
+    }
+    else if(encontrouVermelho>0 && encontrouBranco==0){
+        return 3 ;
+    }else{
+        return 1; // wut
+    }
+}
+
 int main(){
     int jogar = 1;
     int menu = 0;
     int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {
     {0,1,0,1,0,1,0,1},
-    {1,0,2,0,2,0,4,0},
-    {0,1,0,1,0,1,0,2},
-    {1,0,4,0,4,0,1,0},
+    {1,0,2,0,1,0,1,0},
+    {0,1,0,5,0,1,0,1},
+    {1,0,1,0,1,0,1,0},
     {0,1,0,1,0,1,0,1},
-    {1,0,1,0,1,0,3,0},
-    {0,5,0,1,0,5,0,1},
-	{1,0,3,0,3,0,1,0}};
+    {1,0,1,0,1,0,1,0},
+    {0,1,0,1,0,1,0,1},
+	{1,0,1,0,1,0,1,0}};
 
     // {0,2,0,1,0,2,0,2},
     // {2,0,3,0,2,0,2,0},
@@ -445,7 +466,7 @@ int main(){
     fflush(stdin);
 
     jogar = mostraMenu();
-    int linha1, linha2, quemJoga = 1;
+    int linha1, linha2, quemJoga = 2;
     char coluna1, coluna2;
 
     while(jogar){
@@ -456,12 +477,27 @@ int main(){
             scanf("%d%c",&linha1,&coluna1);
             printf("para: ");
             scanf("%d%c",&linha2,&coluna2);
+            
             //faz -1 e -a para diminuir, pois a matriz inicia em zero mas para o usuario inicia em 1
             if(validacoes(tabuleiro, quemJoga, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a'))
                 break;
             printf("Movimento invalido, tente novamente!\n");
         }
+        if(aindaHaJogadas(tabuleiro)==2){
+                // Branco venceu
+                printf("\nParabéns jogador 1! Você venceu a partida!\n");
+                jogar=0;//@TODO: Mudar
+                
+            }
+            else if(aindaHaJogadas(tabuleiro)==3){
+                printf("Parabéns jogador 2! Você venceu a partida!\n");
+                jogar=0;//@TODO: Mudar
+                // Vermelho venceu
+            }
         quemJoga++;
         if(quemJoga>2) quemJoga=1;
+
+        // @TODO: verificar variável JOGAR
+        // se ela for 2 por exemplo, mostra o menu para seleção se o usuário quer jogar novamente ou não
     }
 }
