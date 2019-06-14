@@ -11,6 +11,12 @@
 #define REIBRANCO 4
 #define REIVERMELHO 5
 
+typedef struct nodo{
+    int linha;
+    int coluna;
+    struct nodo* prox;
+}Nodo;
+
 char alimentatabuleiro(int posicao){
 
     switch(posicao)
@@ -79,7 +85,7 @@ int mostraMenu(){
 
 }
 
-void verificaRei(int d[][TAMANHO_TABULEIRO],int jogador,int linha1,int coluna2, int coluna1,int linha2){
+void verificaRei(int d[][TAMANHO_TABULEIRO],int jogador,int linha1,int coluna1, int linha2,int coluna2){
     int aux;
 
     if(jogador == 1){
@@ -317,13 +323,139 @@ int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
     }
 }
 
-int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int coluna1,int linha2,int coluna2){
 
-        if(movimentoValido(tabuleiro, jogador, linha1, coluna1, linha2, coluna2)){
-            mudaposicao(tabuleiro,linha1,coluna1,linha2,coluna2);
-            verificaRei(tabuleiro, jogador, linha1, coluna2, coluna1, linha2);
+int insereNaLista(Nodo **inicioLista, Nodo* novoValor){
+    
+    if((*inicioLista)==NULL){
+        printf("null");
+        (*inicioLista)=novoValor;
+        return 1;
+    }
+
+    Nodo* aux = (*inicioLista);
+
+    while(aux->prox!=NULL){
+        printf("prox \n");
+        aux = aux->prox;
+    }
+
+    aux->prox = novoValor;
+
+}
+
+int obrigadoATomar(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],int jogador,Nodo **inicioLista){
+    int i=0,j=0,arredorInimigoI,arredorInimigoJ;
+
+    for(i=0;i<TAMANHO_TABULEIRO;i++){
+        for(j=0;j<TAMANHO_TABULEIRO;j++){
+            
+            if(((tabuleiro[i-1][j-1]==VERMELHO || tabuleiro[i-1][j-1]==REIVERMELHO) && tabuleiro[i][j] == REIBRANCO && jogador==1)
+                ||
+                ((tabuleiro[i-1][j-1]==BRANCO || tabuleiro[i-1][j-1]==REIBRANCO) && (tabuleiro[i][j] == VERMELHO || tabuleiro[i][j] == REIVERMELHO) && jogador==2)
+                ){
+                arredorInimigoI = i-2;
+                arredorInimigoJ = j-2;
+                if(arredorInimigoI>=0 && arredorInimigoI<TAMANHO_TABULEIRO && arredorInimigoJ>=0 && arredorInimigoJ<TAMANHO_TABULEIRO){
+                    if(tabuleiro[arredorInimigoI][arredorInimigoJ] == 1){
+                        Nodo * novoNodo = (Nodo*)malloc(sizeof(Nodo));
+                        novoNodo->linha = arredorInimigoI;
+                        novoNodo->coluna = arredorInimigoJ;
+                        novoNodo->prox = NULL;
+                        insereNaLista(inicioLista, novoNodo);
+                        // return 1;
+                    }
+                }
+            }
+            if(((tabuleiro[i-1][j+1]==VERMELHO || tabuleiro[i-1][j+1]==REIVERMELHO) && tabuleiro[i][j]==REIBRANCO && jogador==1)
+                ||
+                (tabuleiro[i-1][j+1]==BRANCO || tabuleiro[i-1][j+1]==REIBRANCO) && (tabuleiro[i][j] == VERMELHO || tabuleiro[i][j] == REIVERMELHO) && jogador==2
+                ){
+                arredorInimigoI = i-2;
+                arredorInimigoJ = j+2;
+                if(arredorInimigoI>=0 && arredorInimigoI<TAMANHO_TABULEIRO && arredorInimigoJ>=0 && arredorInimigoJ<TAMANHO_TABULEIRO){
+                    if(tabuleiro[arredorInimigoI][arredorInimigoJ] == 1){
+                        Nodo * novoNodo = (Nodo*)malloc(sizeof(Nodo));
+                        novoNodo->linha = arredorInimigoI;
+                        novoNodo->coluna = arredorInimigoJ;
+                        novoNodo->prox = NULL;
+                        insereNaLista(inicioLista, novoNodo);
+                        // return 1;
+                    }
+                }
+            }
+            if(((tabuleiro[i+1][j-1]==VERMELHO || tabuleiro[i+1][j-1]==REIVERMELHO) && (tabuleiro[i][j]==REIBRANCO || tabuleiro[i][j]==BRANCO) && jogador==1)
+                ||
+                ((tabuleiro[i+1][j-1]==BRANCO || tabuleiro[i+1][j-1]==REIBRANCO) && tabuleiro[i][j] == REIVERMELHO && jogador==2)
+                )
+                {
+                arredorInimigoI = i+2;
+                arredorInimigoJ = j-2;
+                if(arredorInimigoI>=0 && arredorInimigoI<TAMANHO_TABULEIRO && arredorInimigoJ>=0 && arredorInimigoJ<TAMANHO_TABULEIRO){
+                    if(tabuleiro[arredorInimigoI][arredorInimigoJ] == 1){
+                        Nodo * novoNodo = (Nodo*)malloc(sizeof(Nodo));
+                        novoNodo->linha = arredorInimigoI;
+                        novoNodo->coluna = arredorInimigoJ;
+                        novoNodo->prox = NULL;
+                        insereNaLista(inicioLista, novoNodo);
+                        // return 1;
+                    }
+                }
+            }
+            if(((tabuleiro[i+1][j+1]==VERMELHO || tabuleiro[i+1][j+1]==REIVERMELHO) && (tabuleiro[i][j]==REIBRANCO || tabuleiro[i][j]==BRANCO ) && jogador==1)
+                ||
+                ((tabuleiro[i+1][j+1]==BRANCO || tabuleiro[i+1][j+1]==REIBRANCO) && (tabuleiro[i][j] == REIVERMELHO) && jogador==2)
+            ){
+                arredorInimigoI = i+2;
+                arredorInimigoJ = j+2;
+                if(arredorInimigoI>=0 && arredorInimigoI<TAMANHO_TABULEIRO && arredorInimigoJ>=0 && arredorInimigoJ<TAMANHO_TABULEIRO){
+                    if(tabuleiro[arredorInimigoI][arredorInimigoJ] == 1){
+                        Nodo * novoNodo = (Nodo*)malloc(sizeof(Nodo));
+                        novoNodo->linha = arredorInimigoI;
+                        novoNodo->coluna = arredorInimigoJ;
+                        novoNodo->prox = NULL;
+                        insereNaLista(inicioLista, novoNodo);
+                        // return 1;
+                    }
+                }
+            }
+
         }
+    }
+    return 0;
+}
 
+int validaMovimentoObrigatorio(Nodo* inicioLista, int linhaDestino,int colunaDestino){
+    Nodo *aux = inicioLista;
+    int i=0;
+    while(aux!=NULL){
+        printf("\nLinha coluna: %d %d\n", aux->linha, aux->coluna);
+        printf("LinhaDest colunaDest: %d %d\n", linhaDestino, colunaDestino);
+        if(aux->linha==linhaDestino && aux->coluna==colunaDestino){
+            return 1;
+        }
+        aux = aux->prox;
+    }
+    printf("Há uma ou mais peças a serem tomadas mas você não está realizando um movimento que pode tomar peças! Tente novamente \n");
+    return 0;
+}
+
+int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int coluna1,int linhaDestino,int colunaDestino){
+
+    int eObrigado=0;
+    Nodo * inicioLista = (Nodo*)malloc(sizeof(Nodo));
+    inicioLista=NULL;
+    obrigadoATomar(tabuleiro,jogador, &inicioLista);
+
+    if(inicioLista!=NULL){
+        if(!validaMovimentoObrigatorio(inicioLista, linhaDestino,colunaDestino)){
+            return 0;
+        }
+    }
+
+    if(movimentoValido(tabuleiro, jogador, linha1, coluna1, linhaDestino, colunaDestino)){
+        mudaposicao(tabuleiro,linha1,coluna1,linhaDestino,colunaDestino);
+        verificaRei(tabuleiro, jogador, linha1,coluna1, linhaDestino, colunaDestino);
+    }
     else return 0;
 
     return 1;
@@ -334,11 +466,11 @@ int main(){
     int menu = 0;
     int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {
     {0,1,0,1,0,1,0,1},
-    {1,0,1,0,1,0,4,0},
-    {0,3,0,1,0,1,0,2},
+    {2,0,1,0,2,0,4,0},
+    {0,3,0,5,0,1,0,2},
     {1,0,1,0,2,0,1,0},
-    {0,1,0,5,0,2,0,1},
-    {1,0,1,0,1,0,3,0},
+    {0,1,0,5,0,3,0,1},
+    {1,0,1,0,1,0,1,0},
     {0,1,0,1,0,2,0,3},
 	{1,0,3,0,3,0,1,0}};
 
