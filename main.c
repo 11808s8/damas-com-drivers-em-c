@@ -122,97 +122,12 @@ void mudaposicao(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int linha1
     tabuleiro[linha2][coluna2] = aux;
 }
 
-/**
- * Função que valida o movimento para ambos os reis
- * return int - Pode realizar o movimento (1) ou não (0)
- * 
- */
-int movimentoValidoReis(int tabuleiro[][TAMANHO_TABULEIRO], int linhaInicial, int colunaInicial, int linhaDestino, int colunaDestino){
-    
-    int incrementoI,incrementoJ,linhaAuxiliar, colunaAuxiliar;
-
-    // Variáveis de incremento dependendo de para qual posição o jogador pretende movimentar seu rei
-    if(linhaDestino>linhaInicial && colunaDestino>colunaInicial){
-        incrementoI = 1;
-        incrementoJ = 1;
-    }
-    else if(linhaDestino>linhaInicial && colunaDestino<colunaInicial){
-        incrementoI=1;
-        incrementoJ=-1;
-    }
-    else if(linhaDestino<linhaInicial && colunaDestino < colunaInicial){
-        incrementoI=-1;
-        incrementoJ=-1;
-    }
-    else if(linhaDestino<linhaInicial && colunaDestino > colunaInicial){
-        incrementoI=-1;
-        incrementoJ=1;
-    }
-
-    linhaAuxiliar = linhaInicial;
-    colunaAuxiliar = colunaInicial;
-
-    // Anda uma posição para sair da inicial
-    linhaAuxiliar+=incrementoI;
-    colunaAuxiliar+=incrementoJ;
-
-    int quantasPecasInimigasTomou=0;
-    while(linhaAuxiliar!=linhaDestino && colunaAuxiliar!=colunaDestino){
-        if(
-            (tabuleiro[linhaInicial][colunaInicial]==REIBRANCO &&
-            (tabuleiro[linhaAuxiliar][colunaAuxiliar]==BRANCO || 
-           tabuleiro[linhaAuxiliar][colunaAuxiliar]==REIBRANCO))
-           ||
-            (tabuleiro[linhaInicial][colunaInicial]==REIVERMELHO &&
-            (tabuleiro[linhaAuxiliar][colunaAuxiliar]==VERMELHO || 
-           tabuleiro[linhaAuxiliar][colunaAuxiliar]==REIVERMELHO))
-           )
-           {
-            printf("\nVocê não pode pular sobre suas peças! Tente novamente. \n"); // @TODO: Ajustar isso
-            return 0; // Não pode prosseguir, encontrou peça igual a sua
-        }
-
-        // Verificação para caso tenha tomado mais de 1 peça inimiga
-        if((tabuleiro[linhaInicial][colunaInicial]==REIBRANCO &&
-            (tabuleiro[linhaAuxiliar][colunaAuxiliar]==VERMELHO || tabuleiro[linhaAuxiliar][colunaAuxiliar]==REIVERMELHO))
-            ||
-            ((tabuleiro[linhaInicial][colunaInicial]==REIVERMELHO) &&
-            (tabuleiro[linhaAuxiliar][colunaAuxiliar]==BRANCO || tabuleiro[linhaAuxiliar][colunaAuxiliar]==REIBRANCO))
-        ){
-            quantasPecasInimigasTomou++;
-        }
-        
-        
-        linhaAuxiliar+=incrementoI;
-        colunaAuxiliar+=incrementoJ;
-    }
-    if(quantasPecasInimigasTomou>1){
-        printf("Só pode tomar uma peça inimiga na jogada. Se você pode tomar mais, após a primeira \n você poderá continuar jogando e comendo peças enquanto necessário.");
-        return 0;
-    }
-
-    linhaAuxiliar = linhaInicial;
-    colunaAuxiliar = colunaInicial;
-
-    // Anda uma posição para sair da inicial
-    linhaAuxiliar+=incrementoI;
-    colunaAuxiliar+=incrementoJ;
-
-    while(linhaAuxiliar!=linhaDestino && colunaAuxiliar!=colunaDestino){
-        tabuleiro[linhaAuxiliar][colunaAuxiliar]=1;
-
-        linhaAuxiliar+=incrementoI;
-        colunaAuxiliar+=incrementoJ;
-    }
-
-    // Se chegou aqui já mudou as peças do tabuleiro e poderá mover a peça rei
-    return 1;
-            
-}
 
 // @TODO: Aqui colocar a validação se comeu uma peça inimiga
 // Essa função poderia retornar a mensagem ou printar a mensagem na tela
 int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaInicial, int colunaInicial, int linhaDestino, int colunaDestino){
+
+    int muitoLongeReis=0;
 
     // É quem joga, aí avalia os arredores se pode
     if(((tabuleiro[linhaInicial][colunaInicial]==BRANCO || tabuleiro[linhaInicial][colunaInicial]==REIBRANCO) && jogador == 1) ||
@@ -245,22 +160,31 @@ int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
         if(tabuleiro[linhaDestino][colunaDestino] == 1 ){
 
             // Verificação para reis
-            if(tabuleiro[linhaInicial][colunaInicial]==REIBRANCO ||
-                tabuleiro[linhaInicial][colunaInicial]==REIVERMELHO){
-                    return movimentoValidoReis(tabuleiro,linhaInicial, colunaInicial, linhaDestino, colunaDestino);
-            }
+            // if(tabuleiro[linhaInicial][colunaInicial]==REIBRANCO ||
+            //     tabuleiro[linhaInicial][colunaInicial]==REIVERMELHO){
+            //         return movimentoValidoReis(tabuleiro,linhaInicial, colunaInicial, linhaDestino, colunaDestino);
+            // }
             // É uma peça comum branca (só movimenta para baixo)
-            if(tabuleiro[linhaInicial][colunaInicial] == BRANCO){
-                if(linhaDestino < linhaInicial){
-                    printf("Você está tentando retroceder com uma peça simples! Jogada inváida.\n");
+            if(tabuleiro[linhaInicial][colunaInicial] == BRANCO ||
+            tabuleiro[linhaInicial][colunaInicial] == REIBRANCO || 
+            tabuleiro[linhaInicial][colunaInicial] == REIVERMELHO ){
+                if(linhaDestino < linhaInicial && tabuleiro[linhaInicial][colunaInicial] == BRANCO){
+                    printf("Você está tentando retroceder com uma peça simples! Jogada inválida.\n");
                     return 0; // Movimento inválido, está tentando voltar
                 }
                 if(linhaDestino - 1 == linhaInicial && (colunaDestino+1 == colunaInicial || colunaDestino - 1 == colunaInicial)){
                     return 1; // Retorna Válido. Neste ponto não há peça impedindo, é só movimentar.
                 }
-                else if(linhaDestino - 2 == linhaInicial && (colunaDestino + 2 == colunaInicial || colunaDestino - 2 == colunaInicial)
+                else if(( (tabuleiro[linhaInicial][colunaInicial] == BRANCO || tabuleiro[linhaInicial][colunaInicial] == REIBRANCO)  && 
+                (linhaDestino - 2 == linhaInicial && (colunaDestino + 2 == colunaInicial || colunaDestino - 2 == colunaInicial)
                 && (tabuleiro[linhaDestino - 1][colunaDestino + 1] == VERMELHO || tabuleiro[linhaDestino - 1][colunaDestino + 1]== REIVERMELHO
-                || tabuleiro[linhaDestino - 1][colunaDestino - 1] == VERMELHO || tabuleiro[linhaDestino - 1][colunaDestino - 1] == REIVERMELHO)){
+                || tabuleiro[linhaDestino - 1][colunaDestino - 1] == VERMELHO || tabuleiro[linhaDestino - 1][colunaDestino - 1] == REIVERMELHO)) )
+                ||
+                ( (tabuleiro[linhaInicial][colunaInicial] == REIVERMELHO)  && 
+                (linhaDestino - 2 == linhaInicial && (colunaDestino + 2 == colunaInicial || colunaDestino - 2 == colunaInicial)
+                && (tabuleiro[linhaDestino - 1][colunaDestino + 1] == BRANCO || tabuleiro[linhaDestino - 1][colunaDestino + 1]== REIBRANCO
+                || tabuleiro[linhaDestino - 1][colunaDestino - 1] == BRANCO || tabuleiro[linhaDestino - 1][colunaDestino - 1] == REIBRANCO)) 
+                )){
                     if(colunaDestino + 2 == colunaInicial){ // @TODO: SE FOR AUMENTAR SCORE, AUMENTA AQUI
                         tabuleiro[linhaDestino - 1][colunaDestino + 1] = 1;
                     }
@@ -270,25 +194,38 @@ int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
                         return 1;
                 }
                 else{
-                    printf("Você está tentando movimentar sua peça para muito longe! Jogada inváida. \n");
-                    return 0;
+                    if(tabuleiro[linhaInicial][colunaInicial] == BRANCO ){
+                        printf("Você está tentando movimentar sua peça para muito longe! Jogada inválida. \n");
+                        return 0;
+                    }else{
+                        muitoLongeReis ++;
+                    }
                 }
             }
 
             
 
             // É uma peça comum vermelha (só movimenta para cima)
-            if(tabuleiro[linhaInicial][colunaInicial] == VERMELHO){
-                if(linhaDestino > linhaInicial){
+            if(tabuleiro[linhaInicial][colunaInicial] == VERMELHO || 
+            tabuleiro[linhaInicial][colunaInicial] == REIVERMELHO || 
+            tabuleiro[linhaInicial][colunaInicial] == REIBRANCO ){
+                if((linhaDestino > linhaInicial) && tabuleiro[linhaInicial][colunaInicial] == VERMELHO){
                     printf("Você esta tentando retroceder com uma peça simples! Jogada invalida.\n");
                     return 0; // Movimento inválido, está tentando voltar
                 }
                 if(linhaDestino + 1 == linhaInicial && (colunaDestino + 1 == colunaInicial || colunaDestino - 1 == colunaInicial)){
                     return 1; // Retorna Válido. Neste ponto não há peça impedindo, é só movimentar.
                 }
-                else if(linhaDestino + 2 == linhaInicial && (colunaDestino + 2 == colunaInicial || colunaDestino - 2 == colunaInicial)
+                else if(
+                    ((tabuleiro[linhaInicial][colunaInicial] == VERMELHO || tabuleiro[linhaInicial][colunaInicial] == REIVERMELHO) 
+                && (linhaDestino + 2 == linhaInicial && (colunaDestino + 2 == colunaInicial || colunaDestino - 2 == colunaInicial)
                 && (tabuleiro[linhaDestino + 1][colunaDestino + 1]== BRANCO || tabuleiro[linhaDestino + 1][colunaDestino + 1] == REIBRANCO
-                || tabuleiro[linhaDestino + 1][colunaDestino - 1] == BRANCO|| tabuleiro[linhaDestino + 1][colunaDestino - 1] == REIBRANCO)){
+                || tabuleiro[linhaDestino + 1][colunaDestino - 1] == BRANCO|| tabuleiro[linhaDestino + 1][colunaDestino - 1] == REIBRANCO)))
+                || (tabuleiro[linhaInicial][colunaInicial] == REIBRANCO && 
+                (linhaDestino + 2 == linhaInicial && (colunaDestino + 2 == colunaInicial || colunaDestino - 2 == colunaInicial)
+                && (tabuleiro[linhaDestino + 1][colunaDestino + 1]== VERMELHO || tabuleiro[linhaDestino + 1][colunaDestino + 1] == REIVERMELHO
+                || tabuleiro[linhaDestino + 1][colunaDestino - 1] == VERMELHO|| tabuleiro[linhaDestino + 1][colunaDestino - 1] == REIVERMELHO))
+                )){
                     if(colunaDestino + 2 == colunaInicial){ // @TODO: SE FOR AUMENTAR SCORE, AUMENTA AQUI 
                         tabuleiro[linhaDestino + 1][colunaDestino + 1] = 1;
                     }
@@ -298,27 +235,36 @@ int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
                         return 1;
                 }
                 else{
-                    printf("Você esta tentando movimentar sua peça para muito longe! Jogada invalida. \n");
-                    return 0;
+                    if(tabuleiro[linhaInicial][colunaInicial] == VERMELHO ){
+                        printf("Você está tentando movimentar sua peça para muito longe! Jogada inválida. \n");
+                        return 0;
+                    }else{
+                        muitoLongeReis ++;
+                    }
                 }
             }
         }
         else if(tabuleiro[linhaInicial][colunaInicial] == tabuleiro[linhaDestino][colunaDestino]){
-            printf("Você está tentando movimentar sua peça para onde há uma peça sua! Jogada inváida. \n");
+            printf("Você está tentando movimentar sua peça para onde há uma peça sua! Jogada inválida. \n");
             return 0;
         }
         else if(tabuleiro[linhaDestino][colunaDestino]==0){
-            printf("Damas não se joga assim! Movimento só na diagonal! Jogada inváida. \n");
+            printf("Damas não se joga assim! Movimento só na diagonal! Jogada inválida. \n");
             return 0;
         }
         else{
-            printf("Você está tentando movimentar sua peça para onde há a peça do outro jogador! Jogada inváida. \n");
+            printf("Você está tentando movimentar sua peça para onde há a peça do outro jogador! Jogada inválida. \n");
+            return 0;
+        }
+
+        if(muitoLongeReis==2){
+            printf("Você está tentando movimentar sua peça para muito longe! Jogada inválida. \n");
             return 0;
         }
 
     }
     else{
-        printf("Você está tentando jogar com uma peça que não é a sua! Jogada inváida.");
+        printf("Você está tentando jogar com uma peça que não é a sua! Jogada inválida.");
         return 0;
     }
 }
@@ -466,12 +412,12 @@ int main(){
     int menu = 0;
     int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {
     {0,1,0,1,0,1,0,1},
-    {2,0,1,0,2,0,4,0},
-    {0,3,0,5,0,1,0,2},
-    {1,0,1,0,2,0,1,0},
-    {0,1,0,5,0,3,0,1},
-    {1,0,1,0,1,0,1,0},
-    {0,1,0,1,0,2,0,3},
+    {1,0,2,0,2,0,4,0},
+    {0,1,0,1,0,1,0,2},
+    {1,0,4,0,4,0,1,0},
+    {0,1,0,1,0,1,0,1},
+    {1,0,1,0,1,0,3,0},
+    {0,5,0,1,0,5,0,1},
 	{1,0,3,0,3,0,1,0}};
 
     // {0,2,0,1,0,2,0,2},
