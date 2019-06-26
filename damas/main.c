@@ -4,6 +4,7 @@
 #include <locale.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+
 #include "driver.h"
 
 /*-----------------------------------------------------*/
@@ -15,13 +16,19 @@
 #define VERMELHO 3
 #define REIBRANCO 4
 #define REIVERMELHO 5
-#define DEVICE_NAME "/dev/so" 
+
+#define DEVICE_NAME "/dev/so"      
+#define BUF_LEN 1024
+
+/*----------------------------------------------------------------------------*/
 
 typedef struct nodo{
     int linha;
     int coluna;
     struct nodo* prox;
 }Nodo;
+
+/*----------------------------------------------------------------------------*/
 
 char alimentatabuleiro(int posicao){
 
@@ -43,6 +50,8 @@ char alimentatabuleiro(int posicao){
     return ('?');
 }
 
+/*----------------------------------------------------------------------------*/
+
 void printCorPeca(int posicao){
     if(posicao%2==0){ // Branco
         printf("\x1B[1;37m");
@@ -51,9 +60,13 @@ void printCorPeca(int posicao){
     }
 }
 
+/*----------------------------------------------------------------------------*/
+
 char resetaCorTabuleiro(){
     printf("\x1B[0m");
 }
+
+/*----------------------------------------------------------------------------*/
 
 int printaTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
     int linhas, colunas;
@@ -77,6 +90,8 @@ int printaTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]){
     }
 }
 
+/*----------------------------------------------------------------------------*/
+
 int mostraMenu(){
 
     int resposta;
@@ -90,6 +105,8 @@ int mostraMenu(){
     return 0;
 
 }
+
+/*----------------------------------------------------------------------------*/
 
 void verificaRei(int d[][TAMANHO_TABULEIRO],int jogador,int linha1,int coluna1, int linha2,int coluna2){
     int aux;
@@ -110,6 +127,7 @@ void verificaRei(int d[][TAMANHO_TABULEIRO],int jogador,int linha1,int coluna1, 
     }
 }
 
+/*----------------------------------------------------------------------------*/
 
 int ehPossivelComer(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaInicial, int colunaInicial, int linhaDestino, int colunaDestino){
     /* Verificar para a linha inicial e coluna inicial se havia uma
@@ -117,6 +135,8 @@ int ehPossivelComer(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
 
 
 }
+
+/*----------------------------------------------------------------------------*/
 
 void mudaposicao(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int linha1, int coluna1, int linha2, int coluna2){
     int aux;
@@ -128,6 +148,7 @@ void mudaposicao(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int linha1
     tabuleiro[linha2][coluna2] = aux;
 }
 
+/*----------------------------------------------------------------------------*/
 
 // @TODO: Aqui colocar a validação se comeu uma peça inimiga
 // Essa função poderia retornar a mensagem ou printar a mensagem na tela
@@ -275,6 +296,7 @@ int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
     }
 }
 
+/*----------------------------------------------------------------------------*/
 
 int insereNaLista(Nodo **inicioLista, Nodo* novoValor){
     
@@ -294,6 +316,8 @@ int insereNaLista(Nodo **inicioLista, Nodo* novoValor){
     aux->prox = novoValor;
 
 }
+
+/*----------------------------------------------------------------------------*/
 
 int obrigadoATomar(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],int jogador,Nodo **inicioLista){
     int i=0,j=0,arredorInimigoI,arredorInimigoJ;
@@ -376,6 +400,8 @@ int obrigadoATomar(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO],int jogad
     return 0;
 }
 
+/*----------------------------------------------------------------------------*/
+
 int validaMovimentoObrigatorio(Nodo* inicioLista, int linhaDestino,int colunaDestino){
     Nodo *aux = inicioLista;
     int i=0;
@@ -390,6 +416,8 @@ int validaMovimentoObrigatorio(Nodo* inicioLista, int linhaDestino,int colunaDes
     printf("Há uma ou mais peças a serem tomadas mas você não está realizando um movimento que pode tomar peças! Tente novamente \n");
     return 0;
 }
+
+/*----------------------------------------------------------------------------*/
 
 int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int coluna1,int linhaDestino,int colunaDestino){
 
@@ -413,82 +441,103 @@ int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int co
     return 1;
 }
 
+/*----------------------------------------------------------------------------*/
+
+void leTabuleiro(int tabuleiro[][TAMANHO_TABULEIRO], char retorno[BUF_LEN]){
+    
+    int v=0;
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            tabuleiro[i][j] = retorno[v] - '0';
+            v++;
+        }
+    }
+}
+
+/*----------------------------------------------------------------------------*/
+
+void montaMensagemIoctl(int tabuleiro[][TAMANHO_TABULEIRO], char matrizString[BUF_LEN]){
+
+    int v=0;
+    for (int z = 0; z < 8; z++)
+    {
+        for (int h = 0; h < 8; h++)
+        {
+            matrizString[v] = tabuleiro[z][h] + '0'; 
+            v++;
+        }
+    }
+}
+
+/*----------------------------------------------------------------------------*/
+
 int main(){
-    int jogar = 1;
+    int jogador, continuarJogando = 1;
     int menu = 0;
     int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {
+    {0,2,0,2,0,2,0,2},
+    {2,0,2,0,2,0,2,0},
+    {0,2,0,2,0,2,0,2},
+    {1,0,1,0,1,0,1,0},
     {0,1,0,1,0,1,0,1},
-    {1,0,2,0,2,0,4,0},
-    {0,1,0,1,0,1,0,2},
-    {1,0,4,0,4,0,1,0},
-    {0,1,0,1,0,1,0,1},
-    {1,0,1,0,1,0,3,0},
-    {0,5,0,1,0,5,0,1},
-	{1,0,3,0,3,0,1,0}};
-
-    // {0,2,0,1,0,2,0,2},
-    // {2,0,3,0,2,0,2,0},
-    // {0,4,0,2,0,2,0,2},
-    // {1,0,1,0,1,0,1,0},
-    // {0,1,0,2,0,2,0,1},
-    // {3,0,3,0,1,0,3,0},
-    // {0,3,0,3,0,1,0,3},
-	// {3,0,3,0,3,0,3,0}};
-
-    // Teste do rei branco
-    // {0,1,0,1,0,1,0,1},
-    // {1,0,1,0,1,0,1,0},
-    // {0,2,0,1,0,3,0,2},
-    // {1,0,1,0,3,0,1,0},
-    // {0,1,0,4,0,2,0,1},
-    // {1,0,1,0,1,0,3,0},
-    // {0,1,0,1,0,3,0,3},
-	// {1,0,3,0,3,0,1,0}};
+    {3,0,3,0,3,0,3,0},
+    {0,3,0,3,0,3,0,3},
+	{3,0,3,0,3,0,3,0}};    
 
     setlocale(LC_ALL,"Portuguese"); // seta tudo em portugues, dai nao ocorre mais os erros com caracter especial
     fflush(stdin);
-
-    FILE *f = NULL;
-    int i,fp, ret, delay;
-    char str[50];
-    for (i = 100; i < 1000; i+=50)
-    {
-        fp = open(DEVICE_NAME, O_RDWR);
-
-        if ( fp < 0 ){
-            perror("Nao foi possivel acessar\n");
-            exit(0);
-        }
-
-        sprintf(str,"%d",i);
-        
-        ret = ioctl(fp, IOCTL_SET_SPEAKER, str);
-
-        if(ret < 0){
-            printf("Erro ao setar o delay");
-            exit(0);
-        }
-        close(fp);
-    } 
     
-    jogar = mostraMenu();
+    jogador = mostraMenu();
     int linha1, linha2, quemJoga = 1;
     char coluna1, coluna2;
 
-    while(jogar){
+    int file = open(DEVICE_NAME, O_RDWR);
+    char stringRetorno[BUF_LEN
+    ], matrizString[BUF_LEN];
 
-        printaTabuleiro(tabuleiro);
-        while(1){
-            printf("Jogador %d eh a sua vez: ", quemJoga);
+    if(file>0){
+        montaMensagemIoctl(tabuleiro, matrizString);
+        ioctl(file,  IOCTL_SET_MSG, matrizString);
+    }
+
+    while(continuarJogando){
+        
+        int passou = 0;
+        while (file < 0)
+        {
+            if(!passou){
+                printf("\nAguarde o jogador %d terminar sua jogada.\n", jogador);
+                passou = 1;
+            }
+            file = open(DEVICE_NAME, O_RDWR);
+        }
+        while(file > 0){
+            
+            ioctl(file, IOCTL_GET_MSG, stringRetorno);
+            leTabuleiro(tabuleiro, stringRetorno);
+            printaTabuleiro(tabuleiro);
+
+            printf("Jogador %d eh a sua vez: ", jogador);
             scanf("%d%c",&linha1,&coluna1);
             printf("para: ");
             scanf("%d%c",&linha2,&coluna2);
             //faz -1 e -a para diminuir, pois a matriz inicia em zero mas para o usuario inicia em 1
-            if(validacoes(tabuleiro, quemJoga, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a'))
+            if(validacoes(tabuleiro, jogador, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a'))
                 break;
             printf("Movimento invalido, tente novamente!\n");
         }
-        quemJoga++;
-        if(quemJoga>2) quemJoga=1;
+        
+        montaMensagemIoctl(tabuleiro, matrizString);
+        ioctl(file,  IOCTL_SET_MSG, matrizString);
+
+        ioctl(file, IOCTL_GET_MSG, stringRetorno);
+        leTabuleiro(tabuleiro, stringRetorno);
+        printaTabuleiro(tabuleiro);
+
+        printf("vai fechar arquivo\n");
+        close(file);
+        file = -1;
     }
 }
