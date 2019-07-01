@@ -25,4 +25,4 @@ Caso o driver sofra alteração, deve-se compilar ele novamente, remover o drive
     $ sudo insmod driver.ko
 ```
 ##
-Desenvolvido por Adriano Gomes (https://github.com/11808s8) e Bruno Caregnato (https://github.com/brunocaregnato).
+Desenvolvido por [Adriano Gomes](https://github.com/11808s8) e [Bruno Caregnato](https://github.com/brunocaregnato).
