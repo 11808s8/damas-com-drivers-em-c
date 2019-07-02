@@ -9,16 +9,14 @@
 
 /*-----------------------------------------------------------------------------*/
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Andre Luis Martinotto");
-MODULE_DESCRIPTION("Disciplina SO");
+MODULE_AUTHOR("Bruno Caregnato e Adriano Gomes");
+MODULE_DESCRIPTION("Disciplina Sistemas Operacionais (UCS)");
 
 /*----------------------------------------------------------------------------*/
 #define DEVICE 60
 #define DEVICE_NAME "/dev/so"
 
 #define BUF_MSG 80
-
-#define SUCCESS 0
 #define BUF_LEN 80
 
 /*----------------------------------------------------------------------------*/
@@ -79,9 +77,8 @@ void cleanup_device(){
 /*----------------------------------------------------------------------------*/
 static int device_open(struct inode *inode, struct file *file){
 	
-	if (aberto){
-		return -EBUSY;
-	}
+	if (aberto) return -EBUSY;
+	
 	aberto++;
 	ptr = mensagem;
 	try_module_get(THIS_MODULE);
@@ -102,9 +99,8 @@ static ssize_t device_read(struct file *file, char __user * buffer, size_t lengt
 
 	int bytes_read = 0;
 
-	if (*ptr == 0){
-		return 0;
-	}
+	if (*ptr == 0) return 0;
+	
 
 	while (length && *ptr) {
 
@@ -112,7 +108,6 @@ static ssize_t device_read(struct file *file, char __user * buffer, size_t lengt
 		length--;
 		bytes_read++;
 	}
-	printk("Leu %d bytes correspondendo a mensagem: %s", bytes_read, mensagem);
 
 	return bytes_read;
 }
@@ -122,13 +117,9 @@ static ssize_t device_write(struct file *file, const char __user * buffer, size_
 	
 	int i;
 
-	printk("tamanho: %d\n", length);
-	for (i = 0; i < length && i < BUF_MSG; i++){
-		printk("mensagem: %c", mensagem[i]);
-		get_user(mensagem[i], buffer + i);
-	}
+	for (i = 0; i < length && i < BUF_MSG; i++) get_user(mensagem[i], buffer + i);
 
-	printk("Escreveu a mensagem: %s\n",mensagem);
+	printk("\nRecebeu a mensagem: %s\n",mensagem);
 
 	ptr = mensagem;
 
@@ -143,23 +134,17 @@ static long device_ioctl(struct file *file, unsigned int ioctl_num, unsigned lon
 	char *temp;
 	char ch;
 
-	printk("\ncomunicou com o device_ioctl\n");
-	/* 
-	 * Switch according to the ioctl called 
-	 */
+	printk("\nComunicou com o device_ioctl\n");
+
+	//Muda caso seja chamado pelo set ou get msg.
 	switch (ioctl_num) {
 	case IOCTL_SET_MSG:
-		printk("\ncaiu no set_msg\n");
-		/* 
-		 * Receive a pointer to a message (in user space) and set that
-		 * to be the device's message.  Get the parameter given to 
-		 * ioctl by the process. 
-		 */
+		printk("\nCHAMOU IOCTL_SET_MSG\n");
+
+		//Recebe um pointer pra mensagem que o usuário passou para passar para o ioctl.
 		temp = (char *)ioctl_param;
 
-		/* 
-		 * Find the length of the message 
-		 */
+		//Tamanho da mensagem
 		get_user(ch, temp);
 		for (i = 0; ch && i < BUF_LEN; i++, temp++)
 			get_user(ch, temp);
@@ -168,22 +153,17 @@ static long device_ioctl(struct file *file, unsigned int ioctl_num, unsigned lon
 		break;
 
 	case IOCTL_GET_MSG:
-			printk("\ncaiu no get_msg\n");
-		/* 
-		 * Give the current message to the calling process - 
-		 * the parameter we got is a pointer, fill it. 
-		 */
+			printk("\nCHAMOU IOCTL_GET_MSG\n");
+		
+		//Passa a mensagem pro processo de chamada
 		i = device_read(file, (char *)ioctl_param, 99, 0);
 		
 
-		/* 
-		 * Put a zero at the end of the buffer, so it will be 
-		 * properly terminated 
-		 */
+		//Termian a string com \0 
 		put_user('\0', (char *)ioctl_param + i);
 		break;
 	}
 
-	return SUCCESS;
+	return 0;
 	
 }

@@ -129,15 +129,6 @@ void verificaRei(int d[][TAMANHO_TABULEIRO],int jogador,int linha1,int coluna1, 
 
 /*----------------------------------------------------------------------------*/
 
-int ehPossivelComer(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaInicial, int colunaInicial, int linhaDestino, int colunaDestino){
-    /* Verificar para a linha inicial e coluna inicial se havia uma
-        linha destino com coluna destino que era possivel comer alguma peça */
-
-
-}
-
-/*----------------------------------------------------------------------------*/
-
 void mudaposicao(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int linha1, int coluna1, int linha2, int coluna2){
     int aux;
 
@@ -185,12 +176,6 @@ int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
 
         // É um espaço vazio para onde vai
         if(tabuleiro[linhaDestino][colunaDestino] == 1 ){
-
-            // Verificação para reis
-            // if(tabuleiro[linhaInicial][colunaInicial]==REIBRANCO ||
-            //     tabuleiro[linhaInicial][colunaInicial]==REIVERMELHO){
-            //         return movimentoValidoReis(tabuleiro,linhaInicial, colunaInicial, linhaDestino, colunaDestino);
-            // }
             // É uma peça comum branca (só movimenta para baixo)
             if(tabuleiro[linhaInicial][colunaInicial] == BRANCO ||
             tabuleiro[linhaInicial][colunaInicial] == REIBRANCO || 
@@ -301,17 +286,14 @@ int movimentoValido(int tabuleiro[][TAMANHO_TABULEIRO], int jogador, int linhaIn
 int insereNaLista(Nodo **inicioLista, Nodo* novoValor){
     
     if((*inicioLista)==NULL){
-        printf("null");
         (*inicioLista)=novoValor;
         return 1;
     }
 
     Nodo* aux = (*inicioLista);
 
-    while(aux->prox!=NULL){
-        printf("prox \n");
-        aux = aux->prox;
-    }
+    while(aux->prox!=NULL) aux = aux->prox;
+    
 
     aux->prox = novoValor;
 
@@ -406,8 +388,6 @@ int validaMovimentoObrigatorio(Nodo* inicioLista, int linhaDestino,int colunaDes
     Nodo *aux = inicioLista;
     int i=0;
     while(aux!=NULL){
-        printf("\nLinha coluna: %d %d\n", aux->linha, aux->coluna);
-        printf("LinhaDest colunaDest: %d %d\n", linhaDestino, colunaDestino);
         if(aux->linha==linhaDestino && aux->coluna==colunaDestino){
             return 1;
         }
@@ -415,6 +395,30 @@ int validaMovimentoObrigatorio(Nodo* inicioLista, int linhaDestino,int colunaDes
     }
     printf("Há uma ou mais peças a serem tomadas mas você não está realizando um movimento que pode tomar peças! Tente novamente \n");
     return 0;
+}
+
+/*----------------------------------------------------------------------------*/
+
+int verificaSeAcabou(int tabuleiro[][TAMANHO_TABULEIRO], int jogador){
+
+    int i, j;
+    int contJog1=0, contJog2=0;
+
+    for (i = 0; i < TAMANHO_TABULEIRO; i++)
+    {
+        for (j = 0; j < TAMANHO_TABULEIRO; j++)
+        {
+            if(tabuleiro[i][j] == 2 || tabuleiro[i][j] == 4) contJog1++;
+            else if (tabuleiro[i][j] == 3 || tabuleiro[i][j] == 5) contJog2++;
+        }
+    }
+
+    int quemGanhou = 0;
+
+    if(!contJog1) quemGanhou = 2; 
+    else if (!contJog2) quemGanhou = 1;
+    
+    return quemGanhou;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -436,6 +440,7 @@ int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int co
         mudaposicao(tabuleiro,linha1,coluna1,linhaDestino,colunaDestino);
         verificaRei(tabuleiro, jogador, linha1,coluna1, linhaDestino, colunaDestino);
     }
+
     else return 0;
 
     return 1;
@@ -446,9 +451,9 @@ int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int co
 void leTabuleiro(int tabuleiro[][TAMANHO_TABULEIRO], char retorno[BUF_LEN]){
     
     int v=0;
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < TAMANHO_TABULEIRO; i++)
     {
-        for (int j = 0; j < 8; j++)
+        for (int j = 0; j < TAMANHO_TABULEIRO; j++)
         {
             tabuleiro[i][j] = retorno[v] - '0';
             v++;
@@ -458,24 +463,36 @@ void leTabuleiro(int tabuleiro[][TAMANHO_TABULEIRO], char retorno[BUF_LEN]){
 
 /*----------------------------------------------------------------------------*/
 
-void montaMensagemIoctl(int tabuleiro[][TAMANHO_TABULEIRO], char matrizString[BUF_LEN]){
+void montaMensagemIoctl(int tabuleiro[][TAMANHO_TABULEIRO], char matrizString[BUF_LEN], int jogador){
 
     int v=0;
-    for (int z = 0; z < 8; z++)
+    for (int z = 0; z < TAMANHO_TABULEIRO; z++)
     {
-        for (int h = 0; h < 8; h++)
+        for (int h = 0; h < TAMANHO_TABULEIRO; h++)
         {
             matrizString[v] = tabuleiro[z][h] + '0'; 
             v++;
         }
     }
+
+    int ganhou = verificaSeAcabou(tabuleiro, jogador);
+    matrizString[v] = ';';
+    matrizString[++v] = ganhou + '0';
+}
+
+int verificaArquivoTermino(char string[]){
+    
+    int i;
+    for(i=0; i<BUF_LEN;i++)
+        if(string[i] == ';') return string[++i] - '0';
+        
+    return 0;
 }
 
 /*----------------------------------------------------------------------------*/
 
 int main(){
-    int jogador, continuarJogando = 1;
-    int menu = 0;
+    int jogador, continuarJogando = 1, menu = 0, acabou = 0;
     int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {
     {0,2,0,2,0,2,0,2},
     {2,0,2,0,2,0,2,0},
@@ -484,7 +501,19 @@ int main(){
     {0,1,0,1,0,1,0,1},
     {3,0,3,0,3,0,3,0},
     {0,3,0,3,0,3,0,3},
-	{3,0,3,0,3,0,3,0}};    
+	{3,0,3,0,3,0,3,0}};
+    
+    /* MATRIZ DE FIM DE JOGO */
+    /*  
+    {0,1,0,1,0,1,0,1},
+    {1,0,1,0,1,0,1,0},
+    {0,1,0,2,0,1,0,1},
+    {1,0,1,0,3,0,1,0},
+    {0,1,0,1,0,1,0,1},
+    {1,0,1,0,1,0,1,0},
+    {0,1,0,1,0,1,0,1},
+	{1,0,1,0,1,0,1,0}};    
+    */
 
     setlocale(LC_ALL,"Portuguese"); // seta tudo em portugues, dai nao ocorre mais os erros com caracter especial
     fflush(stdin);
@@ -494,11 +523,10 @@ int main(){
     char coluna1, coluna2;
 
     int file = open(DEVICE_NAME, O_RDWR);
-    char stringRetorno[BUF_LEN
-    ], matrizString[BUF_LEN];
+    char stringRetorno[BUF_LEN], matrizString[BUF_LEN];
 
     if(file>0){
-        montaMensagemIoctl(tabuleiro, matrizString);
+        montaMensagemIoctl(tabuleiro, matrizString, jogador);
         ioctl(file,  IOCTL_SET_MSG, matrizString);
     }
 
@@ -508,16 +536,33 @@ int main(){
         while (file < 0)
         {
             if(!passou){
-                printf("\nAguarde o jogador %d terminar sua jogada.\n", jogador);
+                printf("\nAguarde o outro jogador terminar sua jogada.\n");
                 passou = 1;
             }
             file = open(DEVICE_NAME, O_RDWR);
+
+            if(file > 0){
+                sleep(1);
+                //(file, IOCTL_GET_MSG, stringRetorno);
+                acabou = verificaArquivoTermino(stringRetorno);
+            }
         }
-        while(file > 0){
-            
+
+        if(acabou){
             ioctl(file, IOCTL_GET_MSG, stringRetorno);
             leTabuleiro(tabuleiro, stringRetorno);
             printaTabuleiro(tabuleiro);
+        }
+
+        int verificou = 0;
+        while(file > 0 && !acabou){
+            
+            if(!verificou){
+                ioctl(file, IOCTL_GET_MSG, stringRetorno);
+                leTabuleiro(tabuleiro, stringRetorno);
+                printaTabuleiro(tabuleiro);
+                verificou++;
+            }
 
             printf("Jogador %d eh a sua vez: ", jogador);
             scanf("%d%c",&linha1,&coluna1);
@@ -529,15 +574,21 @@ int main(){
             printf("Movimento invalido, tente novamente!\n");
         }
         
-        montaMensagemIoctl(tabuleiro, matrizString);
+        montaMensagemIoctl(tabuleiro, matrizString, jogador);
         ioctl(file,  IOCTL_SET_MSG, matrizString);
 
         ioctl(file, IOCTL_GET_MSG, stringRetorno);
         leTabuleiro(tabuleiro, stringRetorno);
         printaTabuleiro(tabuleiro);
 
-        printf("vai fechar arquivo\n");
+        acabou = !acabou ? verificaArquivoTermino(stringRetorno) : acabou;
+
         close(file);
         file = -1;
+
+        if(acabou) continuarJogando = 0;
     }
+
+    if(acabou == jogador) printf("\nParabéns jogador %d, você venceu!\n", jogador);
+    else printf("\nMais sorte na próxima vez jogador %d!\n", jogador);
 }

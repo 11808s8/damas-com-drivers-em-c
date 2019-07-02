@@ -3,30 +3,29 @@
 
 #include <linux/ioctl.h>
 
+#define UTS_RELEASE "3.3.0-xxx+"
+
 #define MAJOR_NUM 100
 
 #define IOCTL_SET_MSG _IOR(MAJOR_NUM, 0, char *)
 /*
- * _IOR means that we're creating an ioctl command 
- * number for passing information from a user process
- * to the kernel module. 
- *
- * The first arguments, MAJOR_NUM, is the major device 
- * number we're using.
- *
- * The second argument is the number of the command 
- * (there could be several with different meanings).
- *
- * The third argument is the type we want to get from 
- * the process to the kernel.
+  * _IOR significa que estamos criando um comando ioctl
+  * para passar informações de um processo do usuário
+  * para o módulo do kernel.
+  *
+  * O primeirio argumento, MAJOR_NUM, é número do principal 
+  * dispositivo que estamos usando.
+  *
+  * O segundo argumento é o número do comando
+  *
+  * O terceiro argumento é o tipo que queremos obter do processo para o kernel.
  */
 
 #define IOCTL_GET_MSG _IOW(MAJOR_NUM, 1, char *)
 /* 
- * This IOCTL is used for output, to get the message 
- * of the device driver. However, we still need the 
- * buffer to place the message in to be input, 
- * as it is allocated by the process.
+  * Este IOCTL é usado para saída, para obter a mensagem
+  * do driver do dispositivo. No entanto, ainda precisamos do
+  * buffer para colocar a mensagem a ser a entrada  é alocado pelo processo.
  */
 
 #endif
