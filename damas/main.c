@@ -544,8 +544,8 @@ int main(){
             /*if(file > 0){
                 sleep(1);
                 (file, IOCTL_GET_MSG, stringRetorno);
-                acabou = verificaArquivoTermino(stringRetorno);*/
-            }
+                acabou = verificaArquivoTermino(stringRetorno);
+            }*/
         }
 
         /*if(acabou){
