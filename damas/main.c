@@ -423,18 +423,32 @@ int verificaSeAcabou(int tabuleiro[][TAMANHO_TABULEIRO], int jogador){
 
 /*----------------------------------------------------------------------------*/
 
+void limpaLista(Nodo* inicioLista){
+    Nodo *aux;
+    while (inicioLista != NULL) {
+        aux = inicioLista;
+        inicioLista = inicioLista->prox;
+        free (aux);
+    }
+}
+
 int validacoes(int tabuleiro[][TAMANHO_TABULEIRO], int jogador,int linha1,int coluna1,int linhaDestino,int colunaDestino){
 
     int eObrigado=0;
     Nodo * inicioLista = (Nodo*)malloc(sizeof(Nodo));
+    
     inicioLista=NULL;
     obrigadoATomar(tabuleiro,jogador, &inicioLista);
 
     if(inicioLista!=NULL){
         if(!validaMovimentoObrigatorio(inicioLista, linhaDestino,colunaDestino)){
+            limpaLista(inicioLista);
             return 0;
         }
     }
+
+    limpaLista(inicioLista);
+    
 
     if(movimentoValido(tabuleiro, jogador, linha1, coluna1, linhaDestino, colunaDestino)){
         mudaposicao(tabuleiro,linha1,coluna1,linhaDestino,colunaDestino);
