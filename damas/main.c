@@ -541,18 +541,18 @@ int main(){
             }
             file = open(DEVICE_NAME, O_RDWR);
 
-            if(file > 0){
+            /*if(file > 0){
                 sleep(1);
-                //(file, IOCTL_GET_MSG, stringRetorno);
-                acabou = verificaArquivoTermino(stringRetorno);
+                (file, IOCTL_GET_MSG, stringRetorno);
+                acabou = verificaArquivoTermino(stringRetorno);*/
             }
         }
 
-        if(acabou){
+        /*if(acabou){
             ioctl(file, IOCTL_GET_MSG, stringRetorno);
             leTabuleiro(tabuleiro, stringRetorno);
             printaTabuleiro(tabuleiro);
-        }
+        }*/
 
         int verificou = 0;
         while(file > 0 && !acabou){
@@ -581,12 +581,12 @@ int main(){
         leTabuleiro(tabuleiro, stringRetorno);
         printaTabuleiro(tabuleiro);
 
-        acabou = !acabou ? verificaArquivoTermino(stringRetorno) : acabou;
+        //acabou = !acabou ? verificaArquivoTermino(stringRetorno) : acabou;
 
         close(file);
         file = -1;
 
-        if(acabou) continuarJogando = 0;
+        //if(acabou) continuarJogando = 0;
     }
 
     if(acabou == jogador) printf("\nParabéns jogador %d, você venceu!\n", jogador);
