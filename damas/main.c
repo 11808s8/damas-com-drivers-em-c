@@ -473,7 +473,7 @@ void montaMensagemIoctl(int tabuleiro[][TAMANHO_TABULEIRO], char matrizString[BU
 int verificaArquivoTermino(char string[]){
     
     int i;
-    for(i=0; i<BUF_LEN;i++)
+    for(i = TAMANHO_TABULEIRO*TAMANHO_TABULEIRO; i < BUF_LEN; i++)
         if(string[i] == ';') return string[++i] - '0';
         
     return 0;
@@ -484,34 +484,35 @@ int verificaArquivoTermino(char string[]){
 int main(){
     int jogador, continuarJogando = 1, menu = 0, acabou = 0;
     int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {
-    {0,1,0,1,0,1,0,1},
+    //{0,1,0,1,0,1,0,1},
+    //{1,0,1,0,1,0,1,0},
+    //{0,1,0,1,0,1,0,1},
+    //{1,0,3,0,3,0,1,0},
+    //{0,1,0,3,0,1,0,1},
+    //{3,0,3,0,3,0,1,0},
+    //{0,3,0,3,0,2,0,3},
+	//{3,0,3,0,3,0,3,0}};
+    //
+    {0,2,0,2,0,2,0,2},
+    {2,0,2,0,2,0,2,0},
+    {0,2,0,2,0,2,0,2},
     {1,0,1,0,1,0,1,0},
     {0,1,0,1,0,1,0,1},
-    {1,0,3,0,3,0,1,0},
-    {0,1,0,3,0,1,0,1},
-    {3,0,3,0,3,0,1,0},
-    {0,3,0,3,0,2,0,3},
+    {3,0,3,0,3,0,3,0},
+    {0,3,0,3,0,3,0,3},
 	{3,0,3,0,3,0,3,0}};
-    // {0,2,0,2,0,2,0,2},
-    // {2,0,2,0,2,0,2,0},
-    // {0,2,0,2,0,2,0,2},
-    // {1,0,1,0,1,0,1,0},
-    // {0,1,0,1,0,1,0,1},
-    // {3,0,3,0,3,0,3,0},
-    // {0,3,0,3,0,3,0,3},
-	// {3,0,3,0,3,0,3,0}};
     
     /* MATRIZ DE FIM DE JOGO */
-    /*  
-    {0,1,0,1,0,1,0,1},
-    {1,0,1,0,1,0,1,0},
-    {0,1,0,2,0,1,0,1},
-    {1,0,1,0,3,0,1,0},
-    {0,1,0,1,0,1,0,1},
-    {1,0,1,0,1,0,1,0},
-    {0,1,0,1,0,1,0,1},
-	{1,0,1,0,1,0,1,0}};    
-    */
+    
+    //{0,1,0,1,0,1,0,1},
+    //{1,0,1,0,1,0,1,0},
+    //{0,1,0,2,0,1,0,1},
+    //{1,0,1,0,3,0,1,0},
+    //{0,1,0,1,0,1,0,1},
+    //{1,0,1,0,1,0,3,0},
+    //{0,1,0,1,0,1,0,1},
+    //{1,0,1,0,1,0,1,0}};    
+    
 
     setlocale(LC_ALL,"Portuguese"); // seta tudo em portugues, dai nao ocorre mais os erros com caracter especial
     fflush(stdin);
@@ -526,7 +527,8 @@ int main(){
     if(file>0){
         montaMensagemIoctl(tabuleiro, matrizString, jogador);
         ioctl(file,  IOCTL_SET_MSG, matrizString);
-    }else{ // exibe o tabuleiro para o player que entrar por 2o
+    }
+    else{ // exibe o tabuleiro para o player que entrar por 2o
         printaTabuleiro(tabuleiro);
     }
 
@@ -540,29 +542,20 @@ int main(){
                 passou = 1;
             }
             file = open(DEVICE_NAME, O_RDWR);
-
-            /*if(file > 0){
-                sleep(1);
-                (file, IOCTL_GET_MSG, stringRetorno);
-                acabou = verificaArquivoTermino(stringRetorno);
-            }*/
         }
 
-        /*if(acabou){
-            ioctl(file, IOCTL_GET_MSG, stringRetorno);
-            leTabuleiro(tabuleiro, stringRetorno);
-            printaTabuleiro(tabuleiro);
-        }*/
-
         int verificou = 0;
-        while(file > 0 && !acabou){
+        while(file > 0){
             
             if(!verificou){
                 ioctl(file, IOCTL_GET_MSG, stringRetorno);
                 leTabuleiro(tabuleiro, stringRetorno);
                 printaTabuleiro(tabuleiro);
+                acabou = verificaArquivoTermino(stringRetorno);
                 verificou++;
             }
+
+            if(acabou) break;
 
             printf("Jogador %d eh a sua vez: ", jogador);
             scanf("%d%c",&linha1,&coluna1);
@@ -571,6 +564,7 @@ int main(){
             //faz -1 e -a para diminuir, pois a matriz inicia em zero mas para o usuario inicia em 1
             if(validacoes(tabuleiro, jogador, linha1-1,coluna1 - 'a',linha2-1,coluna2 - 'a'))
                 break;
+            
             printf("Movimento invalido, tente novamente!\n");
         }
         
@@ -581,12 +575,13 @@ int main(){
         leTabuleiro(tabuleiro, stringRetorno);
         printaTabuleiro(tabuleiro);
 
-        //acabou = !acabou ? verificaArquivoTermino(stringRetorno) : acabou;
+        acabou = !acabou ? verificaArquivoTermino(stringRetorno) : acabou;
 
         close(file);
         file = -1;
+        sleep(1);
 
-        // if(acabou>0) continuarJogando = 0;
+        if(acabou>0) continuarJogando = 0;
     }
 
     if(acabou == jogador) printf("\nParabéns jogador %d, você venceu!\n", jogador);
