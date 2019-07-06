@@ -1,6 +1,7 @@
 # Aplicação de um Jogo de Damas com a utilização de Drivers no Kernel do Linux
 
 Projeto para disciplina de Fundamentos de Sistemas Operacionais da Universidade de Caxias do Sul (UCS).
+##
 Desenvolvido por [Adriano Gomes](https://github.com/11808s8) e [Bruno Caregnato](https://github.com/brunocaregnato).
 
 ### Configuração do ambiente
